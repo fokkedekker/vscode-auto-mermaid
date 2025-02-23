@@ -13,25 +13,34 @@ class MermaidDiagramPanel {
     }
 
     public static createOrShow(extensionUri: vscode.Uri) {
-        // Always show in the right side panel
-        const column = vscode.ViewColumn.Two;
+        console.log('Creating or showing MermaidDiagramPanel...');
+        try {
+            // Always show in the right side panel
+            const column = vscode.ViewColumn.Two;
 
-        if (MermaidDiagramPanel.currentPanel) {
-            MermaidDiagramPanel.currentPanel._panel.reveal(column);
-            return;
-        }
-
-        const panel = vscode.window.createWebviewPanel(
-            'mermaidDiagram',
-            'Mermaid Diagram',
-            column,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true,
+            if (MermaidDiagramPanel.currentPanel) {
+                console.log('Reusing existing panel');
+                MermaidDiagramPanel.currentPanel._panel.reveal(column);
+                return;
             }
-        );
 
-        MermaidDiagramPanel.currentPanel = new MermaidDiagramPanel(panel);
+            console.log('Creating new webview panel');
+            const panel = vscode.window.createWebviewPanel(
+                'mermaidDiagram',
+                'Mermaid Diagram',
+                column,
+                {
+                    enableScripts: true,
+                    retainContextWhenHidden: true,
+                }
+            );
+
+            MermaidDiagramPanel.currentPanel = new MermaidDiagramPanel(panel);
+            console.log('Successfully created new panel');
+        } catch (error) {
+            console.error('Failed to create/show MermaidDiagramPanel:', error);
+            vscode.window.showErrorMessage(`Failed to create diagram panel: ${error}`);
+        }
     }
 
     public updateDiagram(mermaidCode: string) {
@@ -280,60 +289,71 @@ class MermaidDiagramPanel {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-    // Create service with the extension context
-    const sambanovaService = new SambanovaService(vscode.window.createOutputChannel('Mermaid Code Diagram'), context);
+    console.log('Activating Mermaid Code Diagram extension...');
 
-    let disposable = vscode.commands.registerCommand('mermaid-code-diagram.generateDiagram', async () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            vscode.window.showErrorMessage('No active editor!');
-            return;
-        }
+    try {
+        // Create service with the extension context
+        const sambanovaService = new SambanovaService(vscode.window.createOutputChannel('Mermaid Code Diagram'), context);
 
-        const document = editor.document;
-        const fileContent = document.getText();
-
-        // Create or show the panel
-        MermaidDiagramPanel.createOrShow(context.extensionUri);
-        if (!MermaidDiagramPanel.currentPanel) {
-            return;
-        }
-
-        // Show loading state
-        MermaidDiagramPanel.currentPanel.showLoading();
-
-        try {
-            // Generate diagram using SambaNova
-            const mermaidDiagram = await sambanovaService.generateMermaidDiagram(fileContent);
-
-            // Update the diagram in the panel
-            MermaidDiagramPanel.currentPanel.updateDiagram(mermaidDiagram);
-        } catch (error) {
-            if (error instanceof Error) {
-                vscode.window.showErrorMessage(`Failed to generate diagram: ${error.message}`);
-            } else {
-                vscode.window.showErrorMessage('An unknown error occurred while generating the diagram');
+        let disposable = vscode.commands.registerCommand('mermaid-code-diagram.generateDiagram', async () => {
+            console.log('Executing generateDiagram command...');
+            const editor = vscode.window.activeTextEditor;
+            if (!editor) {
+                vscode.window.showErrorMessage('No active editor!');
+                return;
             }
 
-            // Show error state in the panel
-            if (MermaidDiagramPanel.currentPanel) {
-                MermaidDiagramPanel.currentPanel.updateDiagram(`flowchart TD
-                    A[Error] -->|Failed to generate diagram| B[Please check your configuration and try again]`);
+            const document = editor.document;
+            const fileContent = document.getText();
+
+            // Create or show the panel
+            MermaidDiagramPanel.createOrShow(context.extensionUri);
+            if (!MermaidDiagramPanel.currentPanel) {
+                return;
             }
-        }
-    });
 
-    let clearApiKeyDisposable = vscode.commands.registerCommand('mermaid-code-diagram.clearApiKey', async () => {
-        try {
-            await context.secrets.delete('sambanovaApiKey');
-            vscode.window.showInformationMessage('API Key has been cleared successfully.');
-        } catch (error) {
-            vscode.window.showErrorMessage('Failed to clear API Key.');
-        }
-    });
+            // Show loading state
+            MermaidDiagramPanel.currentPanel.showLoading();
 
-    context.subscriptions.push(disposable);
-    context.subscriptions.push(clearApiKeyDisposable);
+            try {
+                // Generate diagram using SambaNova
+                const mermaidDiagram = await sambanovaService.generateMermaidDiagram(fileContent);
+
+                // Update the diagram in the panel
+                MermaidDiagramPanel.currentPanel.updateDiagram(mermaidDiagram);
+            } catch (error) {
+                if (error instanceof Error) {
+                    vscode.window.showErrorMessage(`Failed to generate diagram: ${error.message}`);
+                } else {
+                    vscode.window.showErrorMessage('An unknown error occurred while generating the diagram');
+                }
+
+                // Show error state in the panel
+                if (MermaidDiagramPanel.currentPanel) {
+                    MermaidDiagramPanel.currentPanel.updateDiagram(`flowchart TD
+                        A[Error] -->|Failed to generate diagram| B[Please check your configuration and try again]`);
+                }
+            }
+        });
+
+        let clearApiKeyDisposable = vscode.commands.registerCommand('mermaid-code-diagram.clearApiKey', async () => {
+            console.log('Executing clearApiKey command...');
+            try {
+                await context.secrets.delete('sambanovaApiKey');
+                vscode.window.showInformationMessage('API Key has been cleared successfully.');
+            } catch (error) {
+                vscode.window.showErrorMessage('Failed to clear API Key.');
+            }
+        });
+
+        context.subscriptions.push(disposable);
+        context.subscriptions.push(clearApiKeyDisposable);
+
+        console.log('Mermaid Code Diagram extension activated successfully');
+    } catch (error) {
+        console.error('Failed to activate Mermaid Code Diagram extension:', error);
+        vscode.window.showErrorMessage(`Extension activation failed: ${error}`);
+    }
 }
 
 export function deactivate() { } 

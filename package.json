@@ -1,0 +1,94 @@
+{
+    "name": "mermaid-code-diagram",
+    "displayName": "Mermaid Code Diagram",
+    "description": "Generate and display Mermaid diagrams from code using LLM",
+    "version": "0.0.4",
+    "publisher": "FokkeDekker",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fokkedekker/vscode-auto-mermaid"
+    },
+    "license": "MIT",
+    "keywords": [
+        "mermaid",
+        "diagram",
+        "visualization",
+        "code analysis",
+        "flowchart",
+        "AI",
+        "LLM"
+    ],
+    "engines": {
+        "vscode": "^1.80.0"
+    },
+    "categories": [
+        "Visualization",
+        "Other"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "mermaid-code-diagram.generateDiagram",
+                "title": "Generate Mermaid Diagram from Code",
+                "category": "Mermaid Code Diagram",
+                "icon": "$(graph)",
+                "enablement": "editorIsOpen && !notebookEditorFocused"
+            },
+            {
+                "command": "mermaid-code-diagram.clearApiKey",
+                "title": "Clear API Key",
+                "category": "Mermaid Code Diagram"
+            }
+        ],
+        "menus": {
+            "editor/title": [
+                {
+                    "command": "mermaid-code-diagram.generateDiagram",
+                    "group": "navigation",
+                    "when": "editorIsOpen && !notebookEditorFocused"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "mermaid-diagram-sidebar",
+                    "title": "Mermaid Code Diagram",
+                    "icon": "media/diagram-icon.svg"
+                }
+            ]
+        },
+        "views": {
+            "mermaid-diagram-sidebar": [
+                {
+                    "type": "webview",
+                    "id": "mermaid-diagram-view",
+                    "name": "Mermaid Diagram",
+                    "visibility": "visible"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/node": "^16.18.34",
+        "@types/vscode": "^1.80.0",
+        "@typescript-eslint/eslint-plugin": "^6.7.0",
+        "@typescript-eslint/parser": "^6.7.0",
+        "eslint": "^8.26.0",
+        "typescript": "^5.2.2"
+    },
+    "dependencies": {
+        "axios": "^1.7.9",
+        "dotenv": "^16.4.7",
+        "mermaid": "^10.6.1"
+    }
+}
