@@ -1,0 +1,17 @@
+.vscode/**
+.vscode-test/**
+node_modules/**
+src/**
+.gitignore
+.env
+.yarnrc
+**/tsconfig.json
+**/.eslintrc.json
+**/*.map
+**/*.ts
+*.vsix
+.github/**
+.git/**
+test/**
+diagram-*.mmd
+diagram-*.png 

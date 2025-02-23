@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+out/
+dist/
+*.vsix
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# VS Code specific
+.vscode-test/
+.vscode/
+*.code-workspace
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+coverage/
+
+# Temporary files
+.DS_Store
+Thumbs.db
+
+# Generated diagrams
+diagram-*.mmd
+diagram-*.png
+
+# IDE specific files
+.idea/
+*.swp
+*.swo
+.history/ 
