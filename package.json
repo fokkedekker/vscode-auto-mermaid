@@ -2,7 +2,7 @@
     "name": "mermaid-code-diagram",
     "displayName": "Mermaid Code Diagram",
     "description": "Generate and display Mermaid diagrams from code using LLM",
-    "version": "0.0.4",
+    "version": "0.0.13",
     "publisher": "FokkeDekker",
     "repository": {
         "type": "git",
@@ -25,15 +25,17 @@
         "Visualization",
         "Other"
     ],
+    "activationEvents": [
+        "onCommand:mermaid-code-diagram.generateDiagram"
+    ],
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
             {
                 "command": "mermaid-code-diagram.generateDiagram",
-                "title": "Generate Mermaid Diagram from Code",
+                "title": "Generate Mermaid Diagram",
                 "category": "Mermaid Code Diagram",
-                "icon": "$(graph)",
-                "enablement": "editorIsOpen && !notebookEditorFocused"
+                "icon": "$(graph)"
             },
             {
                 "command": "mermaid-code-diagram.clearApiKey",
@@ -44,45 +46,28 @@
         "menus": {
             "editor/title": [
                 {
+                    "when": "editorIsOpen && !notebookEditorFocused",
                     "command": "mermaid-code-diagram.generateDiagram",
-                    "group": "navigation",
-                    "when": "editorIsOpen && !notebookEditorFocused"
-                }
-            ]
-        },
-        "viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "mermaid-diagram-sidebar",
-                    "title": "Mermaid Code Diagram",
-                    "icon": "media/diagram-icon.svg"
-                }
-            ]
-        },
-        "views": {
-            "mermaid-diagram-sidebar": [
-                {
-                    "type": "webview",
-                    "id": "mermaid-diagram-view",
-                    "name": "Mermaid Diagram",
-                    "visibility": "visible"
+                    "group": "navigation"
                 }
             ]
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "pretest": "npm run compile && npm run lint",
-        "lint": "eslint src --ext ts",
-        "test": "node ./out/test/runTest.js"
+        "vscode:prepublish": "npm run esbuild-base -- --minify",
+        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+        "esbuild": "npm run esbuild-base -- --sourcemap",
+        "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+        "compile": "npm run esbuild",
+        "watch": "npm run esbuild-watch",
+        "lint": "eslint src --ext ts"
     },
     "devDependencies": {
         "@types/node": "^16.18.34",
         "@types/vscode": "^1.80.0",
         "@typescript-eslint/eslint-plugin": "^6.7.0",
         "@typescript-eslint/parser": "^6.7.0",
+        "esbuild": "^0.20.2",
         "eslint": "^8.26.0",
         "typescript": "^5.2.2"
     },

@@ -293,8 +293,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     try {
         // Create service with the extension context
+        console.log('Creating SambanovaService...');
         const sambanovaService = new SambanovaService(vscode.window.createOutputChannel('Mermaid Code Diagram'), context);
 
+        console.log('Registering generateDiagram command...');
         let disposable = vscode.commands.registerCommand('mermaid-code-diagram.generateDiagram', async () => {
             console.log('Executing generateDiagram command...');
             const editor = vscode.window.activeTextEditor;
@@ -336,6 +338,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
         });
 
+        console.log('Registering clearApiKey command...');
         let clearApiKeyDisposable = vscode.commands.registerCommand('mermaid-code-diagram.clearApiKey', async () => {
             console.log('Executing clearApiKey command...');
             try {
@@ -353,7 +356,10 @@ export function activate(context: vscode.ExtensionContext) {
     } catch (error) {
         console.error('Failed to activate Mermaid Code Diagram extension:', error);
         vscode.window.showErrorMessage(`Extension activation failed: ${error}`);
+        throw error; // Re-throw to ensure VS Code knows activation failed
     }
 }
 
-export function deactivate() { } 
+export function deactivate() {
+    console.log('Deactivating Mermaid Code Diagram extension...');
+} 
